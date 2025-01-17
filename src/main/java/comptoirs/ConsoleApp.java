@@ -94,13 +94,13 @@ public class ConsoleApp implements CommandLineRunner {
 
         tapezEnterPourContinuer();
         log.info("Calcul du montant des articles pour une commande");
-        Integer numeroCommande = 10702; // Exemple de numéro de commande
+        Integer numeroCommande = 2222; // Exemple de numéro de commande
         BigDecimal montant = commandeDAO.montantArticles(numeroCommande);
         log.info("Montant des articles pour la commande {} : {}", numeroCommande, montant);
 
         tapezEnterPourContinuer();
         log.info("Liste des commandes pour un client donné");
-        String codeClient = "ALFKI"; // Exemple de code client
+        String codeClient = "ANATR"; // Exemple de code client
         List<CommandeProjection> commandes = commandeDAO.findCommandesByClientCode(codeClient);
         commandes.forEach(commande ->
                 log.info("Commande : {}, Port : {}, Montant Articles : {}",
