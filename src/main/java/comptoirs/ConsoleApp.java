@@ -1,9 +1,11 @@
 package comptoirs;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+import comptoirs.projection.CommandeProjection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -55,26 +57,26 @@ public class ConsoleApp implements CommandLineRunner {
         tapezEnterPourContinuer();
 
         log.info("Exécution d'une requête 'custom' JPQL");
-        int codeCategorie = 1;
+        int codeCategorie = 68306;
         List<UnitesCommandeesParProduit> resultat = produitDAO.produitsVendusJPQL(codeCategorie);
         resultat.forEach( // Une autre syntaxe pour itérer sur une liste !
-            ligne -> log.info("Pour {} on a vendu {} unités", ligne.getNomProduit(), ligne.getUnitesCommandees())
-        );        
-         
+                ligne -> log.info("Pour {} on a vendu {} unités", ligne.getNomProduit(), ligne.getUnitesCommandees())
+        );
+
         tapezEnterPourContinuer();
 
         log.info("Même requête en SQL natif");
         resultat = produitDAO.produitsVendusSQL(codeCategorie);
-        resultat.forEach( 
-            ligne -> log.info("Pour {} on a vendu {} unités", ligne.getNomProduit(), ligne.getUnitesCommandees())
-        );        
-      
-        tapezEnterPourContinuer();    
+        resultat.forEach(
+                ligne -> log.info("Pour {} on a vendu {} unités", ligne.getNomProduit(), ligne.getUnitesCommandees())
+        );
+
+        tapezEnterPourContinuer();
         log.info("Pour un client, on trouve son adresse 'Embedded'");
         Optional<Client> ocl = clientDAO.findById("BONAP");
         ocl.ifPresent(cl -> log.info("On a trouvé l'adresse de 'BONAP' : {}", cl.getAdresse()));
 
-        tapezEnterPourContinuer();    
+        tapezEnterPourContinuer();
         log.info("Recherche par nom de société");
         Client cli = clientDAO.findBySociete("Alfreds Futterkiste").orElseThrow();
         log.info("On a trouvé le client {}",cli);
@@ -86,8 +88,27 @@ public class ConsoleApp implements CommandLineRunner {
         tapezEnterPourContinuer();
         log.info("Nombre de produits différents commandés par chaque client");
         clientDAO.produitsParClient().forEach(
-            ppc -> log.info("Le client {} a commandé {} produits différents", ppc.getSociete(), ppc.getNombre())
+                ppc -> log.info("Le client {} a commandé {} produits différents", ppc.getSociete(), ppc.getNombre())
         );
+
+
+        tapezEnterPourContinuer();
+        log.info("Calcul du montant des articles pour une commande");
+        Integer numeroCommande = 10702; // Exemple de numéro de commande
+        BigDecimal montant = commandeDAO.montantArticles(numeroCommande);
+        log.info("Montant des articles pour la commande {} : {}", numeroCommande, montant);
+
+        tapezEnterPourContinuer();
+        log.info("Liste des commandes pour un client donné");
+        String codeClient = "ALFKI"; // Exemple de code client
+        List<CommandeProjection> commandes = commandeDAO.findCommandesByClientCode(codeClient);
+        commandes.forEach(commande ->
+                log.info("Commande : {}, Port : {}, Montant Articles : {}",
+                        commande.getNumeroCommande(),
+                        commande.getPort(),
+                        commande.getMontantArticles())
+        );
+
     }
 
     public static void tapezEnterPourContinuer() throws IOException  {
